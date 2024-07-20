@@ -1,0 +1,131 @@
+<!DOCTYPE html>
+<html lang="en" class="dark">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Calypso</title>
+    <link href="https://cdn.jsdelivr.net/npm/tailwindcss@2.2.19/dist/tailwind.min.css" rel="stylesheet">
+    <style>
+        body {
+            margin: 0;
+            overflow: hidden;
+        }
+        .content {
+            position: absolute;
+            top: 50%;
+            left: 50%;
+            transform: translate(-50%, -50%);
+            text-align: center;
+            color: white;
+            z-index: 10;
+
+            -webkit-user-select: none; /* Safari */
+            -ms-user-select: none; /* IE 10 and IE 11 */
+            user-select: none; /* Standard syntax */
+        }
+
+        #globeCanvas {
+            position: absolute;
+            left: 50%;
+            top: 0;
+            width: 200%;
+            height: 200%;
+            
+            z-index: 1;
+        }
+        .dark .content {
+            color: white;
+        }
+        .dark .bg-blue-600 {
+            background-color: #2563eb;
+        }
+        .dark .bg-blue-600:hover {
+            background-color: #1d4ed8;
+        }
+        .dark .bg-green-600 {
+            background-color: #16a34a;
+        }
+        .dark .bg-green-600:hover {
+            background-color: #15803d;
+        }
+        .dark {
+            background-color: #000000;
+            background-image: image-set("https://www.solarsystemscope.com/textures/download/8k_stars.jpg");
+        }
+        .dark-toggle {
+            position: absolute;
+            top: 1rem;
+            right: 1rem;
+            background-color: #3f3f3f;
+            color: white;
+            padding: 0.5rem 1rem;
+            border-radius: 0.25rem;
+            cursor: pointer;
+            z-index: 20;
+        }
+    </style>
+</head>
+<body class="bg-gray-900" id="GlobeCanvas" data-controller="globe">
+    <div class="content">
+        <h1 class="text-6xl font-bold mb-4">Calypso</h1>
+        <p class="text-xl mb-8">Your conversations are safe.</p>
+        <div class="space-x-4">
+            <a href="sign-in.html" class="bg-blue-600 text-white px-4 py-2 rounded hover:bg-blue-700">Sign in</a>
+            <a href="log-in.html" class="bg-green-600 text-white px-4 py-2 rounded hover:bg-green-700">Log in</a>
+        </div>
+    </div>
+
+    <script type="module">
+        import { Application, Controller } from "https://unpkg.com/@hotwired/stimulus@3.1.0/dist/stimulus.js";
+        import * as THREE from "https://unpkg.com/three@0.139.0/build/three.module.js";
+
+        class GlobeController extends Controller {
+            connect() {
+                this.initGlobe();
+            }
+
+            initGlobe() {
+                const scene = new THREE.Scene();
+                const camera = new THREE.PerspectiveCamera(30, window.innerWidth / window.innerHeight, 0.1, 1000);
+                const renderer = new THREE.WebGLRenderer({ alpha: true });
+
+                renderer.setSize(window.innerWidth, window.innerHeight);
+                document.body.appendChild(renderer.domElement);
+                renderer.domElement.id = "globeCanvas";
+
+                const textureLoader = new THREE.TextureLoader();
+                const texture = textureLoader.load('./assets/texture.jpg');
+
+                const sphereGeometry = new THREE.SphereGeometry(1, 32, 32);
+                const sphereMaterial = new THREE.MeshStandardMaterial({ map: texture });
+                const sphere = new THREE.Mesh(sphereGeometry, sphereMaterial);
+                scene.add(sphere);
+
+                const light = new THREE.PointLight(0xffffff, 6, 100);
+                light.position.set(10, 10, 10);
+                scene.add(light);
+
+                camera.position.z = 3;
+
+                const animate = () => {
+                    requestAnimationFrame(animate);
+                    sphere.rotation.x += 0.0005;
+                    sphere.rotation.y += 0.0005;
+                    renderer.render(scene, camera);
+                };
+
+                animate();
+
+                window.addEventListener('resize', () => {
+                    camera.aspect = window.innerWidth / window.innerHeight;
+                    camera.updateProjectionMatrix();
+                    renderer.setSize(window.innerWidth, window.innerHeight);
+                });
+            }
+        }
+
+        const application = Application.start();
+        application.register("globe", GlobeController);
+    </script>
+</body>
+</html>

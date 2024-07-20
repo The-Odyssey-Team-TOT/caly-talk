@@ -10,4 +10,8 @@ Rails.application.routes.draw do
 
   resources :friendships, only: [:create, :destroy]
   get 'search', to: 'chatrooms#search'
+
+  get 'pre_home', to: 'pages#pre_home'
+
+  get 'home', to: 'pages#home'
 end
