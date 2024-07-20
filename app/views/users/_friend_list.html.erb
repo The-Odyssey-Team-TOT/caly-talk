@@ -1,0 +1,17 @@
+<h2>Friends</h2>
+
+<ul>
+  <% current_user.friends.each do |friend| %>
+    <li>
+      <%= friend.email %>
+      <%= link_to 'Remove', friendship_path(friendship_id: current_user.friendships.find_by(friend_id: friend.id)), method: :delete %>
+    </li>
+  <% end %>
+</ul>
+
+<h3>Add a friend</h3>
+<%= form_with url: friendships_path, method: :post, local: true do |form| %>
+  <%= label_tag :friend_email, "Friend's Email" %>
+  <%= text_field_tag :friend_email %>
+  <%= submit_tag "Add" %>
+<% end %>

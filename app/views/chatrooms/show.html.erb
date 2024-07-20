@@ -1,0 +1,12 @@
+<h1><%= @chatroom.name %></h1>
+
+<ul>
+  <% @messages.each do |message| %>
+    <li><%= message.user.email %>: <%= message.content %></li>
+  <% end %>
+</ul>
+
+<%= form_with model: [@chatroom, @message], local: true do |form| %>
+  <%= form.text_area :content %>
+  <%= form.submit "Send" %>
+<% end %>

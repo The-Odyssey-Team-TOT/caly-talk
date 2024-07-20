@@ -1,0 +1,15 @@
+<h1>Chatrooms</h1>
+
+<%= form_with url: search_path, method: :get, local: true do %>
+  <%= label_tag :query, "Search for Chatrooms" %>
+  <%= text_field_tag :query %>
+  <%= submit_tag "Search" %>
+<% end %>
+
+<%= link_to 'New Chatroom', new_chatroom_path %>
+
+<ul>
+  <% @chatrooms.each do |chatroom| %>
+    <li><%= link_to chatroom.name, chatroom %></li>
+  <% end %>
+</ul>
