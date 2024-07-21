@@ -7,13 +7,18 @@
 <% if user_signed_in? %>
 <body class="bg-black">
 </body>
-<meta http-equiv="refresh" content="0; URL=home">
+<meta http-equiv="refresh" content="0; URL=/feed">
 <%else%>
   <style>
     body {
       margin: 0;
       overflow: hidden;
     }
+
+    .buttonRounded {
+        border-radius:50rem !important;
+    }
+
     .content {
       position: absolute;
       top: 50%;
@@ -64,6 +69,9 @@
       cursor: pointer;
       z-index: 20;
     }
+    .textdecooff{
+        text-decoration:none;
+    }
   </style>
 </head>
 
@@ -72,8 +80,8 @@
     <h1 class="text-6xl font-bold mb-4">Calypso</h1>
     <p class="text-xl mb-8">Your conversations are safe.</p>
     <div class="space-x-4">
-      <%= link_to 'Sign up', "/users/sign_up", class: "bg-blue-600 text-white px-4 py-2 rounded hover:bg-blue-700" %>
-      <%= link_to 'Log in', "/users/sign_in", class: "bg-green-600 text-white px-4 py-2 rounded hover:bg-green-700" %>
+      <%= link_to 'Sign up', "/users/sign_up", class: "bg-blue-600 text-white px-4 py-2 rounded hover:bg-blue-700 textdecooff buttonRounded" %>
+      <%= link_to 'Log in', "/users/sign_in", class: "bg-green-600 text-white px-4 py-2 rounded hover:bg-green-700 textdecooff buttonRounded" %>
     </div>
   </div>
 

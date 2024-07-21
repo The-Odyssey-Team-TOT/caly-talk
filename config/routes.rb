@@ -12,8 +12,11 @@ Rails.application.routes.draw do
   resources :friendships, only: [:create, :destroy]
 
   get 'users/profile', to: 'users#profile'
-  get 'chatroom', to: 'chatrooms#index'
-  get 'home', to: 'pages#home'
+  get 'chat', to: 'chatrooms#index'
+  get 'feed', to: 'pages#home'
+  get 'users/friendlist', to: 'users#_friend_list'
+
+  # User Settings
   get 'users/settings', to: 'settings#view'
   patch 'users/settings/update_profile_picture', to: 'settings#update_profile_picture'
   patch 'users/settings/update_username', to: 'settings#update_username'

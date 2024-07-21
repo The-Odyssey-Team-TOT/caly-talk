@@ -19,11 +19,15 @@
         .dark .content, .dark .message h3, .dark .message p, .dark .post-footer {
             color: white;
         }
+
+        .buttonRounded {
+            border-radius:50rem !important;
+        }
         .dark .bg-blue-600 {
-            background-color: #2563eb;
+            background-color: #1f2937;
         }
         .dark .bg-blue-600:hover {
-            background-color: #1d4ed8;
+            background-color: #0f151c;
         }
         .dark .bg-green-600 {
             background-color: #16a34a;
@@ -78,6 +82,12 @@
             background: rgba(40, 40, 40, 0.8);
             border-radius: 0.5rem;
             margin-bottom: 1rem;
+            min-height: 30rem;
+            overflow-x: hidden;
+            
+            -webkit-user-select: none; /* Safari */
+            -ms-user-select: none; /* IE 10 and IE 11 */
+            user-select: none; /* Standard syntax */
         }
 
         @media (min-width: 768px) {
@@ -96,6 +106,13 @@
             display: flex;
             flex-direction: column;
         }
+
+         @media (max-width: 700px) {
+            .chatbox {
+                max-height: 30rem;
+            }
+        } 
+
         .chatbox h1 {
             word-wrap: break-word;
             max-width: 65rem;
@@ -103,12 +120,14 @@
 
         .chat {
             flex: 1;
+            overflow-x: hidden;
             background: rgba(7, 7, 7, 0.836);
             border-radius: 0.7rem;
             box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
             color: #000;
             padding: 1rem;
             overflow-y: auto;
+            max-width: 70rem;
         }
 
         .message {
@@ -122,6 +141,7 @@
             justify-content: space-between;
             align-items: center;
             position: relative;
+            word-wrap: anywhere;
         }
 
         .message:hover {
@@ -265,6 +285,62 @@
             overflow: auto;
             color: white;
         }
+
+        .custom-inputArea {
+            max-height: 2.5rem !important;
+            border-radius: 50rem !important;
+            -ms-overflow-style: none;  /* IE and Edge */
+            scrollbar-width: none;  /* Firefox */
+        }
+
+        .custom-inputArea::-webkit-scrollbar {
+            display: none; /* Hide scrollbar */
+        }
+
+        .send {
+            background: url("/assets/send.svg") no-repeat center center !important;
+            background-size: 60% 100% !important;
+            cursor: pointer;
+            border: none;
+            max-width: 2.5rem;
+            border-radius: 50rem !important;
+            margin-left: 5px;
+            background-position-x: 40% !important;
+        }
+
+        .send:hover {
+            animation-name: rotate;
+            animation-duration: 1s;
+            animation-iteration-count: infinite;
+        }
+
+        @keyframes rotate {
+        0% {
+            transform: rotate(0deg);
+        }
+        100% {
+            transform: rotate(360deg);
+        }
+
+        /* width */
+        ::-webkit-scrollbar {
+            width: 20px;
+        }
+
+        /* Track */
+        ::-webkit-scrollbar-track {
+            box-shadow: inset 0 0 5px grey;
+            border-radius: 10px;
+        }
+
+        /* Handle */
+        ::-webkit-scrollbar-thumb {
+            background: red;
+            border-radius: 10px;
+        }
+
+}
+
     </style>
 </head>
 <body class="bg-gray-900 dark">
@@ -281,8 +357,8 @@
             <div class="mb-4">
                 <%= form_with url: search_chatrooms_path, method: :get, local: true do %>
                     <div class="flex items-center mb-4">
-                        <%= text_field_tag :query, nil, placeholder: 'Search for Chatrooms', class: "dark-input bg-gray-800 text-white px-4 py-2 rounded w-full" %>
-                        <%= submit_tag "Search", class: "ml-2 bg-blue-600 text-white px-4 py-2 rounded hover:bg-blue-700" %>
+                        <%= text_field_tag :query, nil, placeholder: 'Search for Chatrooms', class: "dark-input bg-gray-800 text-white px-4 py-2 rounded w-full resize-none custom-inputArea" %>
+                        <%= submit_tag "Search", class: "ml-2 bg-blue-600 text-white px-4 py-2 rounded hover:bg-blue-700 buttonRounded" %>
                     </div>
                 <% end %>
             </div>
@@ -300,8 +376,8 @@
                         </div>
                     <% end %>
                     <div class="flex items-center">
-                        <%= form.text_field :name, placeholder: :name,class: "dark-input bg-gray-800 text-white px-4 py-2 rounded w-full", maxlength: 100 %>
-                        <%= form.submit "Create", class: "ml-2 bg-blue-600 text-white px-4 py-2 rounded hover:bg-blue-700" %>
+                        <%= form.text_field :name, placeholder: :name,class: "dark-input bg-gray-800 text-white px-4 py-2 rounded w-full resize-none custom-inputArea", maxlength: 100 %>
+                        <%= form.submit "Create", class: "ml-2 bg-blue-600 text-white px-4 py-2 rounded hover:bg-blue-700 buttonRounded" %>
                     </div>
                 <% end %>
             </div>
@@ -313,7 +389,7 @@
                             <h1><%= chatroom.name %></h1>
                         </a>
                         <% if chatroom.owned_by?(current_user) %>
-                            <%= button_to 'Delete', chatroom_path(chatroom), method: :delete, data: { confirm: 'Are you sure?' }, class: "delete-button ml-2 bg-red-600 text-white px-4 py-2 rounded hover:bg-red-700" %>
+                            <%= button_to 'Delete', chatroom_path(chatroom), method: :delete, data: { confirm: 'Are you sure?' }, class: "delete-button ml-2 bg-red-600 text-white px-4 py-2 rounded hover:bg-red-700 buttonRounded" %>
                         <% end %>
                     </li>
                 <% end %>
@@ -332,7 +408,7 @@
                                     <div class="markdown"><%= markdown(message.content) %></div>
                                 </div>
                                 <% if message.owned_by?(current_user) || @current_chatroom.owned_by?(current_user) %>
-                                    <%= button_to 'Delete', chatroom_message_path(@current_chatroom, message), method: :delete, data: { confirm: 'Are you sure?' }, class: "delete-button ml-2 bg-red-600 text-white px-4 py-2 rounded hover:bg-red-700" %>
+                                    <%= button_to 'Delete', chatroom_message_path(@current_chatroom, message), method: :delete, data: { confirm: 'Are you sure?' }, class: "delete-button ml-2 bg-red-600 text-white px-4 py-2 rounded hover:bg-red-700 buttonRounded" %>
                                 <% end %>
                             </li>
                         <% end %>
@@ -350,8 +426,8 @@
                         </div>
                     <% end %>
                     <div class="input-container">
-                        <%= form.text_area :content, class: "dark-input bg-gray-800 text-white px-4 py-2 rounded w-full" %>
-                        <%= form.submit "Send", class: "ml-2 bg-blue-600 text-white px-4 py-2 rounded hover:bg-blue-700" %>
+                        <%= form.text_area :content, class: "dark-input bg-gray-800 text-white px-4 py-2 rounded w-full resize-none custom-inputArea" %>
+                        <%= form.submit "", class: "send" %>
                     </div>
                 <% end %>
             <% else %>
@@ -378,7 +454,7 @@
                 const rect = item.getBoundingClientRect();
                 const x = e.clientX - rect.left;
                 const y = e.clientY - rect.top;
-                item.style.background = `radial-gradient(circle at ${x}px ${y}px, #92ff5f, #7ffe7b, #000000)`;
+                item.style.background = `radial-gradient(circle at ${x}px ${y}px, #0081a0, #014b84, #000000)`;
             });
 
             item.addEventListener('mouseleave', function() {
