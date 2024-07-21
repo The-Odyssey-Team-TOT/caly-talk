@@ -77,6 +77,11 @@
             font-size: 0.875rem;
             margin-top: 0.5rem;
         }
+        input.dark-input:focus {
+            background-color: #2d3748;
+            border-color: #4a5568;
+            color: white;
+        }
     </style>
 </head>
 <body class="bg-gray-900 dark">
@@ -90,13 +95,13 @@
                     <%= f.input :email,
                                 required: false,
                                 autofocus: true,
-                                input_html: { autocomplete: "email", class: "bg-gray-800 text-white px-4 py-2 rounded w-full" } %>
-                    <p id="usernameError" class="error-message" style="display: none;">Username is required.</p>
+                                input_html: { autocomplete: "email", class: "dark-input bg-gray-800 text-white px-4 py-2 rounded w-full" } %>
+                    <p id="usernameError" class="error-message" style="display: none;">Email is required.</p>
                 </div>
                 <div>
                     <%= f.input :password,
                                 required: false,
-                                input_html: { autocomplete: "current-password", class: "bg-gray-800 text-white px-4 py-2 rounded w-full" } %>
+                                input_html: { autocomplete: "current-password", class: "dark-input bg-gray-800 text-white px-4 py-2 rounded w-full" } %>
                     <p id="passwordError" class="error-message" style="display: none;">Password is required.</p>
                 </div>
                 <% if devise_mapping.rememberable? %>

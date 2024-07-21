@@ -1,17 +1,390 @@
-<%= render "shared/navbar" %>
+<!DOCTYPE html>
+<html lang="en" class="dark">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Calypso Chatroom</title>
+    <link href="https://cdn.jsdelivr.net/npm/tailwindcss@2.2.19/dist/tailwind.min.css" rel="stylesheet">
+    <style>
+        body {
+            margin: 0;
+            overflow: hidden;
+            background: black;
+        }
+        .content {
+            text-align: center;
+            color: white;
+            z-index: 10;
+        }
+        .dark .content, .dark .message h3, .dark .message p, .dark .post-footer {
+            color: white;
+        }
+        .dark .bg-blue-600 {
+            background-color: #2563eb;
+        }
+        .dark .bg-blue-600:hover {
+            background-color: #1d4ed8;
+        }
+        .dark .bg-green-600 {
+            background-color: #16a34a;
+        }
+        .dark .bg-green-600:hover {
+            background-color: #15803d;
+        }
+        .dark {
+            background: black;
+        }
 
-<h1>Chatrooms</h1>
+        /* Starry background */
+        #stars {
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            z-index: 0;
+            background: black url('https://www.transparenttextures.com/patterns/stardust.png') repeat;
+            animation: twinkling 200s infinite;
+        }
 
-<%= form_with url: search_path, method: :get, local: true do %>
-  <%= label_tag :query, "Search for Chatrooms" %>
-  <%= text_field_tag :query %>
-  <%= submit_tag "Search" %>
-<% end %>
+        @keyframes twinkling {
+            from {background-position: 0 0;}
+            to {background-position: -10000px 5000px;}
+        }
 
-<%= link_to 'New Chatroom', new_chatroom_path %>
+        .main-content {
+            display: flex;
+            flex-direction: column;
+            height: calc(100vh - 80px); /* Adjust height for navbar space */
+            position: relative;
+            z-index: 10;
+            margin-top: 1rem;
+            padding: 2rem;
+            background: rgba(255, 255, 255, 0.1);
+            border-radius: 0.5rem;
+            overflow-y: auto;
+        }
 
-<ul>
-  <% @chatrooms.each do |chatroom| %>
-    <li><%= link_to chatroom.name, chatroom %></li>
-  <% end %>
-</ul>
+        @media (min-width: 768px) {
+            .main-content {
+                flex-direction: row;
+            }
+        }
+
+        .sidebar {
+            overflow-y: auto;
+            width: 100%;
+            padding: 1rem;
+            background: rgba(40, 40, 40, 0.8);
+            border-radius: 0.5rem;
+            margin-bottom: 1rem;
+        }
+
+        @media (min-width: 768px) {
+            .sidebar {
+                width: 25%;
+                margin-bottom: 0;
+                overflow-y: auto;
+            }
+        }
+
+        .chatbox {
+            flex: 1;
+            padding: 1rem;
+            background: rgba(255, 255, 255, 0.1);
+            border-radius: 0.5rem;
+            display: flex;
+            flex-direction: column;
+        }
+        .chatbox h1 {
+            word-wrap: break-word;
+            max-width: 65rem;
+        }
+
+        .chat {
+            flex: 1;
+            background: rgba(7, 7, 7, 0.836);
+            border-radius: 0.7rem;
+            box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+            color: #000;
+            padding: 1rem;
+            overflow-y: auto;
+        }
+
+        .message {
+            background: #181A1B;
+            border-radius: 0.5rem;
+            padding: 0.5rem;
+            margin-bottom: 0.5rem;
+            box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+            color: #fff;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            position: relative;
+        }
+
+        .message:hover {
+            background: white;
+            color: #000;
+        }
+
+        .message h3 {
+            color: inherit;
+        }
+
+        .message p {
+            color: inherit;
+        }
+
+        .chatroom-item {
+            background: #181A1B;
+            border-radius: 0.5rem;
+            padding: 0.5rem;
+            margin-bottom: 0.5rem;
+            box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+            color: #fff;
+            transition: background 0.3s, color 0.3s;
+            justify-content: space-between;
+            align-items: center;
+            position: relative;
+            word-wrap: break-word;
+        }
+
+        .chatroom-item:hover {
+            background: white;
+            color: white;
+        }
+
+        .chatroom-item a {
+            flex: 1;
+            color: inherit;
+            text-decoration: none;
+            word-wrap: break-word;
+        }
+
+        .delete-button {
+            display: none;
+            position: absolute;
+            right: -20px;
+            top: 50%;
+            transform: translateY(-50%);
+            opacity: 0;
+            transition: right 1s ease;
+        }
+
+        .message:hover .delete-button,
+        .chatroom-item:hover .delete-button {
+            display: inline-block;
+            opacity: 1;
+            height:auto;
+            right:10px;
+            animation-name: deleteHoverAnimation;
+            animation-duration: 0.5s;
+            animation-iteration-count: 1;
+        }
+
+        @keyframes deleteHoverAnimation {
+          0% {right: -20px; opacity: 0;}
+          100% {right: 10px; opacity: 100;}
+        }
+
+        .input-container {
+            display: flex;
+            align-items: center;
+            margin-top: 1rem;
+        }
+
+        .input-container input, .input-container textarea {
+            flex: 1;
+            padding: 0.5rem;
+            border-radius: 0.5rem;
+            border: 1px solid #ccc;
+            color: white;
+            background: rgba(7, 7, 7, 0.836);
+        }
+
+        .input-container button {
+            margin-left: 0.5rem;
+            padding: 0.5rem 1rem;
+            background-color: #2563eb;
+            color: white;
+            border: none;
+            border-radius: 0.5rem;
+            cursor: pointer;
+        }
+
+        .input-container button:hover {
+            background-color: #1d4ed8;
+        }
+
+        /* Markdown Styles */
+        .markdown h1, .markdown h2, .markdown h3, .markdown h4, .markdown h5, .markdown h6 {
+            color: white;
+            margin-top: 1rem;
+            margin-bottom: 1rem;
+        }
+        .markdown p {
+            color: white;
+            margin-bottom: 1rem;
+        }
+        .markdown ul, .markdown ol {
+            color: white;
+            margin-left: 2rem;
+            margin-bottom: 1rem;
+        }
+        .markdown blockquote {
+            color: gray;
+            border-left: 4px solid #555;
+            padding-left: 1em;
+            margin-left: 0;
+            margin-bottom: 1rem;
+        }
+        .markdown table {
+            width: 100%;
+            border-collapse: collapse;
+            margin-bottom: 1rem;
+        }
+        .markdown th, .markdown td {
+            border: 1px solid #ddd;
+            padding: 8px;
+            color: white;
+        }
+        .markdown th {
+            background-color: #555;
+        }
+        .markdown code {
+            background-color: #333;
+            padding: 2px 4px;
+            border-radius: 3px;
+        }
+        .markdown pre {
+            background-color: #333;
+            padding: 10px;
+            border-radius: 5px;
+            overflow: auto;
+            color: white;
+        }
+    </style>
+</head>
+<body class="bg-gray-900 dark">
+    <div id="stars"></div>
+    <!-- Navbar -->
+    <header>
+        <%= render "shared/navbar" %>
+    </header>
+    <main class="container mx-auto main-content">
+        <!-- Sidebar for chatroom search, creation, and list -->
+        <div class="sidebar">
+            <h2 class="text-white text-2xl font-bold mb-4 select-none">Chatrooms</h2>
+            <!-- Chatroom Selector -->
+            <div class="mb-4">
+                <%= form_with url: search_chatrooms_path, method: :get, local: true do %>
+                    <div class="flex items-center mb-4">
+                        <%= text_field_tag :query, nil, placeholder: 'Search for Chatrooms', class: "dark-input bg-gray-800 text-white px-4 py-2 rounded w-full" %>
+                        <%= submit_tag "Search", class: "ml-2 bg-blue-600 text-white px-4 py-2 rounded hover:bg-blue-700" %>
+                    </div>
+                <% end %>
+            </div>
+            <!-- Chatroom Creation -->
+            <div class="mb-4">
+                <%= form_with model: @chatroom, local: true do |form| %>
+                    <% if @chatroom.errors.any? %>
+                        <div class="text-red-500 mb-4">
+                            <h2>Form is invalid</h2>
+                            <ul>
+                                <% @chatroom.errors.full_messages.each do |message| %>
+                                    <li><%= message %></li>
+                                <% end %>
+                            </ul>
+                        </div>
+                    <% end %>
+                    <div class="flex items-center">
+                        <%= form.text_field :name, placeholder: :name,class: "dark-input bg-gray-800 text-white px-4 py-2 rounded w-full", maxlength: 100 %>
+                        <%= form.submit "Create", class: "ml-2 bg-blue-600 text-white px-4 py-2 rounded hover:bg-blue-700" %>
+                    </div>
+                <% end %>
+            </div>
+            <!-- Chatroom List -->
+            <ul class="mb-4">
+                <% @chatrooms.each do |chatroom| %>
+                    <li class="chatroom-item">
+                        <a href="<%= chatroom_path(chatroom) %>">
+                            <h1><%= chatroom.name %></h1>
+                        </a>
+                        <% if chatroom.owned_by?(current_user) %>
+                            <%= button_to 'Delete', chatroom_path(chatroom), method: :delete, data: { confirm: 'Are you sure?' }, class: "delete-button ml-2 bg-red-600 text-white px-4 py-2 rounded hover:bg-red-700" %>
+                        <% end %>
+                    </li>
+                <% end %>
+            </ul>
+        </div>
+        <!-- Chatbox -->
+        <div class="chatbox">
+            <% if @current_chatroom %>
+                <h1 class="text-3xl text-white mb-4"><%= @current_chatroom.name %></h1>
+                <div class="chat">
+                    <ul>
+                        <% @messages.each do |message| %>
+                            <li class="message">
+                                <div>
+                                    <h3 class="text-lg font-semibold"><%= message.user.email %></h3>
+                                    <div class="markdown"><%= markdown(message.content) %></div>
+                                </div>
+                                <% if message.owned_by?(current_user) || @current_chatroom.owned_by?(current_user) %>
+                                    <%= button_to 'Delete', chatroom_message_path(@current_chatroom, message), method: :delete, data: { confirm: 'Are you sure?' }, class: "delete-button ml-2 bg-red-600 text-white px-4 py-2 rounded hover:bg-red-700" %>
+                                <% end %>
+                            </li>
+                        <% end %>
+                    </ul>
+                </div>
+                <%= form_with model: [@current_chatroom, @message], local: true do |form| %>
+                    <% if @message.errors.any? %>
+                        <div class="text-red-500 mb-4">
+                            <h2>Form is invalid</h2>
+                            <ul>
+                                <% @message.errors.full_messages.each do |message| %>
+                                    <li><%= message %></li>
+                                <% end %>
+                            </ul>
+                        </div>
+                    <% end %>
+                    <div class="input-container">
+                        <%= form.text_area :content, class: "dark-input bg-gray-800 text-white px-4 py-2 rounded w-full" %>
+                        <%= form.submit "Send", class: "ml-2 bg-blue-600 text-white px-4 py-2 rounded hover:bg-blue-700" %>
+                    </div>
+                <% end %>
+            <% else %>
+                <p class="text-white">Select a chatroom to view messages.</p>
+            <% end %>
+        </div>
+    </main>
+    <script>
+        document.querySelectorAll('.message').forEach(message => {
+            message.addEventListener('mousemove', function(e) {
+                const rect = message.getBoundingClientRect();
+                const x = e.clientX - rect.left;
+                const y = e.clientY - rect.top;
+                message.style.background = `radial-gradient(circle at ${x}px ${y}px, #ff7e5f, #feb47b, #000000)`;
+            });
+
+            message.addEventListener('mouseleave', function() {
+                message.style.background = '#181A1B';
+            });
+        });
+
+        document.querySelectorAll('.chatroom-item').forEach(item => {
+            item.addEventListener('mousemove', function(e) {
+                const rect = item.getBoundingClientRect();
+                const x = e.clientX - rect.left;
+                const y = e.clientY - rect.top;
+                item.style.background = `radial-gradient(circle at ${x}px ${y}px, #92ff5f, #7ffe7b, #000000)`;
+            });
+
+            item.addEventListener('mouseleave', function() {
+                item.style.background = '#181A1B';
+            });
+        });
+    </script>
+</body>
+</html>

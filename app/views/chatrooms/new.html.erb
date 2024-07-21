@@ -1,9 +1,0 @@
-<%= render "shared/navbar" %>
-
-<h1>New Chatroom</h1>
-
-<%= form_with model: @chatroom, local: true do |form| %>
-  <%= form.label :name %>
-  <%= form.text_field :name %>
-  <%= form.submit "Create" %>
-<% end %>

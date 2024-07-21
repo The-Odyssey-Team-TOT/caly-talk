@@ -1,17 +1,22 @@
-# config/routes.rb
 Rails.application.routes.draw do
-  get 'messages/create'
   devise_for :users
-  root 'chatrooms#index'
+  root 'pages#pre_home'
 
-  resources :chatrooms, only: [:index, :show, :new, :create] do
-    resources :messages, only: [:create]
+  resources :chatrooms, only: [:index, :show, :new, :create, :destroy] do
+    resources :messages, only: [:create, :destroy]
+    collection do
+      get 'search', to: 'chatrooms#search'
+    end
   end
 
   resources :friendships, only: [:create, :destroy]
-  get 'search', to: 'chatrooms#search'
 
-  get 'pre_home', to: 'pages#pre_home'
-
+  get 'users/profile', to: 'users#profile'
+  get 'chatroom', to: 'chatrooms#index'
   get 'home', to: 'pages#home'
+  get 'users/settings', to: 'settings#view'
+  patch 'users/settings/update_profile_picture', to: 'settings#update_profile_picture'
+  patch 'users/settings/update_username', to: 'settings#update_username'
+  patch 'users/settings/update_email', to: 'settings#update_email'
+  patch 'users/settings/update_password', to: 'settings#update_password'
 end
